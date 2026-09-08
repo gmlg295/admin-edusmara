@@ -19,6 +19,8 @@ class Absensi extends ResourceController
             'enable_menu' => false,
         ]);
     }
+
+    
    
     
     public function getData()
