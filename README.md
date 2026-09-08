@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # CodeIgniter 4 Framework
 
 ## What is CodeIgniter?
@@ -63,4 +63,3 @@ Additionally, make sure that the following extensions are enabled in your PHP:
 =======
 # admin-edusmara
 admin-edusmara
->>>>>>> 63202fc0c332fb1e2b64045de49acbdff08c3563
