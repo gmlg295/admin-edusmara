@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers\Pengumuman;
+namespace App\Modules\SMS\Controllers\Pengumuman;
 use CodeIgniter\RESTful\ResourceController;
 
 class Pengumuman extends ResourceController
@@ -11,7 +11,7 @@ class Pengumuman extends ResourceController
     // GET /kelas - Mengambil data dengan Pagination & Search
      public function index()
     {
-        return view('content/master/master_pengumuman', [
+        return view('App\Modules\SMS\Views\content\master\master_pengumuman', [
             'title' => 'Pengumuman - EDUSMARA',
             'active' => 'master',
             'load_js' => 'page/master/pengumuman.js',

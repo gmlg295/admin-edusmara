@@ -5,7 +5,7 @@ use CodeIgniter\RESTful\ResourceController;
 
 class Agenda extends ResourceController
 {
-    protected $modelName = 'App\Models\AgendaModel';
+    protected $modelName = 'App\Modules\SMS\Models\AgendaModel';
     protected $format    = 'json';
 
     // GET /kelas - Mengambil data dengan Pagination & Search

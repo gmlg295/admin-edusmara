@@ -18,7 +18,7 @@ const categoryConfig = {
 
 const targetLabels = { semua:'Semua', siswa:'Siswa', guru:'Guru & Staff', ortu:'Orang Tua', kelas12:'Kelas XII' };
 const priorityLabels = { normal:'Normal', penting:'⭐ Penting', darurat:'🔴 Darurat' };
-const ApiData =  new MyFetch('/agenda/getData', { method: 'GET'});
+const ApiData =  new MyFetch('/sms/agenda/getData', { method: 'GET'});
 // Seed demo
     async function loadDataFromServer() {
         try {
@@ -262,7 +262,7 @@ async function saveAnnouncement(status){
         status: status
     };
 
-    const submitData =  new MyFetch('/agenda/add', 
+    const submitData =  new MyFetch('/sms/agenda/add', 
             {
                 method: 'POST',
                 csrfHash: document.getElementById('csrf_edusmara').textContent,
@@ -279,7 +279,7 @@ async function saveAnnouncement(status){
         if (files) {
             formData.append('isUpdateFile', 'true');
         }
-             const updateData =  new MyFetch('/agenda/update/' + editId, 
+             const updateData =  new MyFetch('/sms/agenda/update/' + editId, 
                                 {
                                     method: 'POST',
                                     csrfHash: document.getElementById('csrf_edusmara').textContent,
