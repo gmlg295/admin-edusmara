@@ -1,0 +1,35 @@
+
+
+========================= FAISEN =========================
+1. PENGUMUMAN
+2. AGENDA
+3. JENIS PENGUMUMAN
+4. JENIS AGENDA
+-----------------
+5. SANKSI
+6. TINGKAT KASUS
+7. JENIS PELANGGARAN
+8. SUB JENIS PELANGGARAN
+9. ALASAN TERLAMBAT
+10. PELANGGARAN SISWA
+
+
+
+========================= BIMA ========================= 
+
+1. KELAS
+2. SISWA
+3. JENIS PRESTASI
+4. SISWA BERPRESTASI
+--------------------
+5. GURU
+
+
+
+
+========================= IRFAN ========================= 
+
+1. MATA PELAJARAN
+2. JADWAL PELAJARAN
+3. ABSENSI
+4. JENIS MAPEL
