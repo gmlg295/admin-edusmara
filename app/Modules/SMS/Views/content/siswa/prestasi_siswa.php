@@ -82,20 +82,22 @@
                     <input type="hidden" id="editId" value="">
 
                     <div class="form-section">
-                        <div class="form-section-title"><i class="fa-solid fa-user-tie"></i><span>Data Pribadi</span></div>
-                        <div class="form-group">
-                            <label class="form-label-custom">Nama Lengkap <span class="required">*</span></label>
-                            <input type="text" class="form-control-custom" id="inputNama" placeholder="Contoh: Drs. Budi Santoso, M.Pd." required>
-                        </div>
+                        <div class="form-section-title"><i class="fa-solid fa-user-tie"></i><span>Data Siswa Berprestasi</span></div>
+                        
                         <div class="form-row three-col">
                             <div class="form-group">
-                                <label class="form-label-custom">NIP <span class="required">*</span></label>
-                                <input type="text" class="form-control-custom" id="inputNip" placeholder="Contoh: 198507152010011003" required>
+                                <label class="form-label-custom">Nama Kelas/Ruangan <span class="required">*</span></label>
+                                <select class="form-control-custom" id="inputNamaKelas" required>
+                                    <option value="">Pilih</option>
+                                </select>
                             </div>
                             
                             <div class="form-group">
-                                <label class="form-label-custom">NUPTK <span class="required">*</span></label>
-                                <input type="text" class="form-control-custom" id="inputNuptk" placeholder="Contoh: 198507152010011003" required>
+                                <label class="form-label-custom">Pilih Siswa <span class="required">*</span></label>
+                                <select class="form-control-custom" id="inputSiswa" name="inputSiswa" required>
+                                    <option value="">Pilih</option>
+                                    
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label class="form-label-custom">Jenis Kelamin <span class="required">*</span></label>

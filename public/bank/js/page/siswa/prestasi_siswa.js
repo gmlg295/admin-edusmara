@@ -6,6 +6,8 @@
     let guruData = []; //JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
     let currentDetailId = null;
     let detailModalInst, deleteModalInst;
+    const inputNamaKelas = document.getElementById('inputNamaKelas');
+    const inputSiswa = document.getElementById('inputSiswa');
 
     const ApiDataGuru  =  new MyFetch('/mst/getDataGuru', { method: 'GET'});
     async function loadDataFromServer() {
@@ -33,7 +35,8 @@
         loadDataFromServer();
         initTabs();
         updateSummary();
-        renderList();
+        renderList(); 
+        loadDataKelas();
     });
 
     // ============ TABS ============
@@ -386,6 +389,65 @@
             input.classList.remove('is-invalid');
         });
         document.querySelectorAll('.form-note').forEach(note => note.textContent = '');
+    }
+
+    inputNamaKelas.addEventListener('change', function() {
+        loadDataSiswaByKelas(this.value);
+    })
+
+    function loadDataSiswaByKelas(id_kelas = null) {
+
+        const dataSiswa  =  new MyFetch('/prestasi/getDataSiswa', { method: 'GET', params: { kelas: id_kelas } });
+        try {
+            dataSiswa.fetchData().then(result => {
+                console.log(' Result:', result);
+
+                if(result.status){
+                    const data = result.data;
+                    inputSiswa.innerHTML = '';
+                    data.forEach(siswa => {
+                        const option = document.createElement('option');
+                        option.value = siswa.id_siswa;
+                        option.textContent = `${siswa.nisn} - ${siswa.nama_lengkap}`;
+                        inputSiswa.appendChild(option);
+                    });
+                }
+                
+            });
+
+        } catch (error) {
+            console.error(error);
+            
+        }
+        
+    }
+    
+    
+    function loadDataKelas() {
+        const datas  =  new MyFetch('/prestasi/getDataKelas', { method: 'GET' });
+        
+        try {
+            datas.fetchData().then(result => {
+                console.log(' Result:', result);
+
+                if(result.status){
+                    const data = result.data;
+                    inputNamaKelas.innerHTML = '';
+                    data.forEach(r => {
+                        const option = document.createElement('option');
+                        option.value = r.id_kelas;
+                        option.textContent = `Kelas ${r.tingkat} - ${r.nama_kelas}`;
+                        inputNamaKelas.appendChild(option);
+                    });
+                }
+                
+            });
+
+        } catch (error) {
+            console.error(error);
+            
+        }
+        
     }
 
     // ============ SUMMARY ============

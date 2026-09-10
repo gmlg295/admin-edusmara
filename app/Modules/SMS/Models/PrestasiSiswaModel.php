@@ -64,6 +64,17 @@ class PrestasiSiswaModel extends Model
 
     public function getAllData()
     {
-        return $this->db->query("SELECT *, (SELECT mstguru.nama_lengkap FROM mstguru WHERE mstguru.id_guru = mstkelas.wali_kelas_id) as nama_wali FROM `mstkelas` ORDER BY mstkelas.tingkat ASC, mstkelas.urutan ASC;")->getResult();
+        return $this->db->query("SELECT a.*, b.nama_lengkap, c.nama_kelas, c.tingkat FROM refsiswaberprestasi a INNER JOIN mstsiswa b ON a.`id_siswa`= b.`id_siswa` INNER JOIN mstkelas c ON b.`id_kelas`=c.`id_kelas` WHERE b.`status_siswa`='aktif' ORDER BY a.`tingkat` ASC, a.poin_didapat DESC;")->getResult();
+    }
+
+    
+    public function getDataSiswa($kelas=0)
+    {
+        return $this->db->query("SELECT b.id_siswa, b.nisn, b.jenis_kelamin, b.tempat_lahir, b.tanggal_lahir, b.alamat_lengkap, b.nomor_hp, b.nama_lengkap, c.nama_kelas, c.tingkat FROM mstsiswa b INNER JOIN mstkelas c ON b.`id_kelas`=c.`id_kelas` WHERE b.`status_siswa`='aktif' AND  c.`id_kelas`='{$kelas}' ORDER BY b.nama_lengkap ASC;")->getResult();
+    }
+
+    public function getDataKelas()
+    {
+        return $this->db->query("SELECT id_kelas, nama_kelas, tingkat FROM mstkelas ORDER BY `tingkat` ASC;")->getResult();
     }
 }

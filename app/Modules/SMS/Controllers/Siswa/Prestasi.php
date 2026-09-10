@@ -24,9 +24,24 @@ class Prestasi extends ResourceController
     {
         return $this->respond([
             'status'  => true,
-            'kategori' => $this->model->getKategori(),
             'data'    => $this->model->getAllData(),
-            'total'   => $this->model->countAllResults(false)
+        ]);
+    }
+    
+    public function getDataSiswa()
+    {
+        $id_kelas = $this->request->getGet('kelas');
+        return $this->respond([
+            'status'  => true,
+            'data'    => $this->model->getDataSiswa( $id_kelas ),
+        ]);
+    }
+    
+    public function getDataKelas()
+    {
+        return $this->respond([
+            'status'  => true,
+            'data'    => $this->model->getDataKelas(),
         ]);
     }
     // POST /kelas - Simpan Data Baru
