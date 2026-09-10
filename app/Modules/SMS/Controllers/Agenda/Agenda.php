@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers\Agenda;
+namespace App\Modules\SMS\Controllers\Agenda;
 use CodeIgniter\RESTful\ResourceController;
 
 class Agenda extends ResourceController
@@ -11,7 +11,7 @@ class Agenda extends ResourceController
     // GET /kelas - Mengambil data dengan Pagination & Search
      public function index()
     {
-        return view('content/master/master_agenda', [
+        return view('App\Modules\SMS\Views\content\master\master_agenda', [
             'title' => 'Agenda - EDUSMARA',
             'active' => 'agenda',
             'load_js' => 'page/master/agenda.js',

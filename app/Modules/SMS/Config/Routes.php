@@ -3,26 +3,8 @@
 use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
-$routes->get('/', 'Auth::index');
 
-$routes->group('home', ['filter' => 'adminfilter'], function($routes) {
-    $routes->get('/', 'Home::index');
-});
-
-$routes->group('auth', function($routes) {
-    $routes->get('/', 'Auth::index');
-    $routes->post('login', 'Auth::login');
-    $routes->get('refresh-captcha', 'Auth::refreshCaptcha');
-    $routes->get('device-conf', 'Auth::getDeviceConf');
-    $routes->post('device-logs', 'DeviceLog::store');
-    $routes->get('logout', 'Auth::logout');
-});
-
-$routes->group('dashboard', ['filter' => 'adminfilter'], function($routes) {
-    $routes->get('/', 'Dashboard::index');
-});
-
-$routes->group('siswa', ['filter' => 'adminfilter'], function($routes) {
+$routes->group('sms/siswa', ['namespace' => 'App\Modules\SMS\Controllers', 'filter' => 'adminfilter'], function($routes) {
     $routes->get('/', 'Siswa\Siswa::index');
     $routes->get('getData', 'Siswa\Siswa::getData');
     $routes->post('add', 'Siswa\Siswa::create');
@@ -34,7 +16,7 @@ $routes->group('siswa', ['filter' => 'adminfilter'], function($routes) {
     $routes->post('saveFile', 'Siswa\SiswaImport::save');
 });
 
-$routes->group('prestasi', ['filter' => 'adminfilter'], function($routes) {
+$routes->group('sms/prestasi', ['namespace' => 'App\Modules\SMS\Controllers', 'filter' => 'adminfilter'], function($routes) {
     $routes->get('/', 'Siswa\Prestasi::index');
     $routes->get('getData', 'Siswa\Prestasi::getData');
     $routes->post('add', 'Siswa\Prestasi::create');
@@ -45,7 +27,7 @@ $routes->group('prestasi', ['filter' => 'adminfilter'], function($routes) {
 });
 
 
-$routes->group('pengumuman', ['filter' => 'adminfilter'], function($routes) {
+$routes->group('sms/pengumuman', ['namespace' => 'App\Modules\SMS\Controllers', 'filter' => 'adminfilter'], function($routes) {
     $routes->get('/', 'Pengumuman\Pengumuman::index');
     //$routes->get('getKategori', 'Pengumuman\Pengumuman::getKategori');
     $routes->get('getData', 'Pengumuman\Pengumuman::getData');
@@ -55,7 +37,7 @@ $routes->group('pengumuman', ['filter' => 'adminfilter'], function($routes) {
 
 });
 
-$routes->group('agenda', ['filter' => 'adminfilter'], function($routes) {
+$routes->group('sms/agenda', ['namespace' => 'App\Modules\SMS\Controllers', 'filter' => 'adminfilter'], function($routes) {
     $routes->get('/', 'Agenda\Agenda::index');
     $routes->get('getKategori', 'Agenda\Agenda::getKategori');
     $routes->get('getData', 'Agenda\Agenda::getData');
@@ -66,11 +48,11 @@ $routes->group('agenda', ['filter' => 'adminfilter'], function($routes) {
 
 });
 
-$routes->group('nilai', ['filter' => 'adminfilter'], function($routes) {
+$routes->group('sms/nilai', ['namespace' => 'App\Modules\SMS\Controllers', 'filter' => 'adminfilter'], function($routes) {
     $routes->get('/', 'Nilai::index');
 });
 
-$routes->group('absensi', ['filter' => 'adminfilter'], function($routes) {
+$routes->group('sms/absensi', ['namespace' => 'App\Modules\SMS\Controllers', 'filter' => 'adminfilter'], function($routes) {
     $routes->get('/', 'Siswa\Absensi::index');
     $routes->get('getData', 'Siswa\Absensi::getData');
     $routes->post('add', 'Siswa\Absensi::create');
@@ -79,7 +61,7 @@ $routes->group('absensi', ['filter' => 'adminfilter'], function($routes) {
     
 });
 
-$routes->group('pelanggaran', ['filter' => 'adminfilter'], function($routes) {
+$routes->group('sms/pelanggaran', ['namespace' => 'App\Modules\SMS\Controllers','filter' => 'adminfilter'], function($routes) {
     $routes->get('/', 'Siswa\Pelanggaran::index');
     $routes->get('getData', 'Siswa\Pelanggaran::getData');
     $routes->post('add', 'Siswa\Pelanggaran::create');
@@ -87,16 +69,16 @@ $routes->group('pelanggaran', ['filter' => 'adminfilter'], function($routes) {
     $routes->get('delete/(:num)', 'Siswa\Pelanggaran::delete/$1');
 });
 
-$routes->group('guru', ['filter' => 'adminfilter'], function($routes) {
+$routes->group('sms/guru', ['namespace' => 'App\Modules\SMS\Controllers','filter' => 'adminfilter'], function($routes) {
     $routes->get('/', 'Guru::index');
 });
 
-$routes->group('mapel', ['filter' => 'adminfilter'], function($routes) {
+$routes->group('sms/mapel', ['namespace' => 'App\Modules\SMS\Controllers','filter' => 'adminfilter'], function($routes) {
     $routes->get('/', 'Mapel::index');
 });
 
 
-$routes->group('master', ['filter' => 'adminfilter'], function($routes) {
+$routes->group('sms/master', ['namespace' => 'App\Modules\SMS\Controllers', 'filter' => 'adminfilter'], function($routes) {
     $routes->get('guru', 'Master\Master::guru');
     $routes->get('kelas', 'Master\Master::kelas');
     $routes->get('jenis-agenda', 'Master\Master::agenda');
@@ -121,7 +103,7 @@ $routes->group('master', ['filter' => 'adminfilter'], function($routes) {
     * routing ke controller master / controller kelas, guru, etc.
     */
 
-$routes->group('mst', ['filter' => 'adminfilter'], function($routes) {
+$routes->group('sms/mst', ['namespace' => 'App\Modules\SMS\Controllers','filter' => 'adminfilter'], function($routes) {
     // Routes for Kelas
     $routes->get('getDataKelas', 'Master\Kelas::index');
     $routes->post('inputKelas', 'Master\Kelas::create');
