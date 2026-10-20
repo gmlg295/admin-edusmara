@@ -44,8 +44,32 @@ $routes->group('sms/agenda', ['namespace' => 'App\Modules\SMS\Controllers', 'fil
     $routes->post('add', 'Agenda\Agenda::create');
     $routes->post('update/(:num)', 'Agenda\Agenda::update/$1');
     $routes->get('delete/(:num)', 'Agenda\Agenda::delete/$1');
-    
 
+
+});
+
+$routes->group('sms/tingkatkasus', ['namespace' => 'App\Modules\SMS\Controllers', 'filter' => 'adminfilter'], function($routes) {
+    $routes->get('/', 'TingkatKasus\TingkatKasus::index');
+    $routes->get('getData', 'TingkatKasus\TingkatKasus::getData');
+    $routes->post('create', 'TingkatKasus\TingkatKasus::create');
+    $routes->post('update/(:num)', 'TingkatKasus\TingkatKasus::update/$1');
+    $routes->get('delete/(:num)', 'TingkatKasus\TingkatKasus::delete/$1');
+});
+
+$routes->group('sms/kategoriprestasi', ['namespace' => 'App\Modules\SMS\Controllers', 'filter' => 'adminfilter'], function($routes) {
+    $routes->get('/', 'KategoriPrestasi\KategoriPrestasi::index');
+    $routes->get('getData', 'KategoriPrestasi\KategoriPrestasi::getData');
+    $routes->post('create', 'KategoriPrestasi\KategoriPrestasi::create');
+    $routes->post('update/(:num)', 'KategoriPrestasi\KategoriPrestasi::update/$1');
+    $routes->get('delete/(:num)', 'KategoriPrestasi\KategoriPrestasi::delete/$1');
+});
+
+$routes->group('sms/sanksi', ['namespace' => 'App\Modules\SMS\Controllers', 'filter' => 'adminfilter'], function($routes) {
+    $routes->get('/', 'Sanksi\Sanksi::index');
+    $routes->get('getData', 'Sanksi\Sanksi::getData');
+    $routes->post('create', 'Sanksi\Sanksi::create');
+    $routes->post('update/(:num)', 'Sanksi\Sanksi::update/$1');
+    $routes->get('delete/(:num)', 'Sanksi\Sanksi::delete/$1');
 });
 
 $routes->group('sms/nilai', ['namespace' => 'App\Modules\SMS\Controllers', 'filter' => 'adminfilter'], function($routes) {
@@ -67,6 +91,8 @@ $routes->group('sms/pelanggaran', ['namespace' => 'App\Modules\SMS\Controllers',
     $routes->post('add', 'Siswa\Pelanggaran::create');
     $routes->post('update/(:num)', 'Siswa\Pelanggaran::update/$1');
     $routes->get('delete/(:num)', 'Siswa\Pelanggaran::delete/$1');
+    $routes->get('getDataConfig', 'Siswa\Pelanggaran::getDataConfig');
+    $routes->get('getDataSiswa', 'Siswa\Pelanggaran::getDataSiswa');
 });
 
 $routes->group('sms/guru', ['namespace' => 'App\Modules\SMS\Controllers','filter' => 'adminfilter'], function($routes) {
@@ -76,7 +102,7 @@ $routes->group('sms/guru', ['namespace' => 'App\Modules\SMS\Controllers','filter
 $routes->group('sms/mapel', ['namespace' => 'App\Modules\SMS\Controllers','filter' => 'adminfilter'], function($routes) {
     $routes->get('/', 'Mapel::index');
 });
-
+ 
 
 $routes->group('sms/master', ['namespace' => 'App\Modules\SMS\Controllers', 'filter' => 'adminfilter'], function($routes) {
     $routes->get('guru', 'Master\Master::guru');
@@ -84,12 +110,12 @@ $routes->group('sms/master', ['namespace' => 'App\Modules\SMS\Controllers', 'fil
     $routes->get('jenis-agenda', 'Master\Master::agenda');
     $routes->get('mapel', 'Master\Master::mapel');
     $routes->get('kategori-informasi', 'Master\Master::kategoriInformasi');
-    $routes->get('kategori-prestasi', 'Master\Master::kategoriPrestasi');
-    $routes->get('jenis-pelanggaran', 'Master\Master::jenisPelanggaran');
+    $routes->get('kategori-prestasi', 'KategoriPrestasi\KategoriPrestasi::index');
+    $routes->get('jenis-pelanggaran', 'Master\SubJenisPelanggaran::index');
     $routes->get('sub-pelanggaran', 'Master\Master::subPelanggaran');
-    $routes->get('tingkat-kasus', 'Master\Master::tingkatKasus');
+    $routes->get('tingkat-kasus', 'TingkatKasus\TingkatKasus::index');
     $routes->get('alasan-terlambat', 'Master\Master::alasanTerlambat');
-    $routes->get('sanksi', 'Master\Master::sanksi');
+    $routes->get('sanksi', 'Sanksi\Sanksi::index');
     $routes->get('jenjang', 'Master\Master::jenjang');
     $routes->get('profil-sekolah', 'Master\Master::profilSekolah');
     $routes->get('pengaturan', 'Master\Master::pengaturan');

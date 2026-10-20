@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Modules\SMS\Models;
 
 use CodeIgniter\Model;
 
@@ -64,6 +64,56 @@ class PelanggaranModel extends Model
 
     public function getAllData()
     {
-        return $this->db->query("SELECT *, (SELECT mstguru.nama_lengkap FROM mstguru WHERE mstguru.id_guru = mstkelas.wali_kelas_id) as nama_wali FROM `mstkelas` ORDER BY mstkelas.tingkat ASC, mstkelas.urutan ASC;")->getResult();
+        return $this->db->query("SELECT a.id_pelanggaran, a.id_siswa, a.id_jenis_pelanggaran, a.id_sub_jenis, a.id_tingkat_kasus, a.id_sanksi, a.id_alasan_terlambat, a.tanggal_kejadian,
+        a.jam_masuk_sekolah, a.jam_tiba_sekolah, a.durasi_bolos, a.keterangan, a.diketahui_oleh, a.dicatat_oleh, a.status, a.catatan_tindak_lanjut,
+        b.nama_lengkap, b.nisn, b.nis, b.jenis_kelamin, c.tingkat, c.nama_kelas,
+        d.nama_jenis, d.kode_jenis, e.nama_sub_jenis, f.nama_tingkat, f.kode_tingkat, f.bobot_poin, g.nama_sanksi, g.kode_sanksi
+
+        FROM refpelanggaransiswa a 
+        INNER JOIN mstsiswa b ON a.`id_siswa`=b.`id_siswa`
+        LEFT JOIN mstkelas c ON	b.`id_kelas`=c.`id_kelas`	
+        INNER JOIN refjenispelanggaran d ON a.`id_jenis_pelanggaran`=d.`id_jenis_pelanggaran`
+        LEFT JOIN refsubjenispelanggaran e ON a.`id_sub_jenis`=e.`id_sub_jenis`
+        LEFT JOIN reftingkatkasus f ON a.`id_tingkat_kasus`=f.`id_tingkat_kasus`
+        LEFT JOIN refsanksi g ON a.`id_sanksi`=g.`id_sanksi` ORDER BY a.`id_pelanggaran` DESC;")->getResult();
+    }
+    
+    public function getdataJenisPelanggaran()
+    {
+        $data = $this->db->query("SELECT * FROM refjenispelanggaran ORDER BY urutan ASC;")->getResult();
+        $array = [];
+        foreach ($data as $r) {
+           $array[$r->kode_jenis] = ['id' => $r->id_jenis_pelanggaran, 'label' => $r->nama_jenis, 'desc' => $r->deskripsi];
+        }
+        return $data;
+    }
+    public function getdataSubJenisPelanggaran()
+    {
+        return $this->db->query("SELECT * FROM refsubjenispelanggaran ORDER BY urutan ASC;")->getResult();
+    }
+    
+    public function getdataAlasanTerlambat()
+    {
+        return $this->db->query("SELECT * FROM refalasanterlambat ORDER BY urutan ASC;")->getResult();
+    }
+    
+    public function getdataTingkatKasus()
+    {
+        return $this->db->query("SELECT * FROM reftingkatkasus ORDER BY urutan ASC;")->getResult();
+    }
+
+    public function getdataSanksi()
+    {
+        return $this->db->query("SELECT * FROM refsanksi ORDER BY urutan ASC;")->getResult();
+    }
+
+    public function getdataSiswa($id_kelas = 0)
+    {
+        return $this->db->query("SELECT id_siswa, nama_lengkap, nisn, nis, jenis_kelamin, tingkat, nama_kelas FROM mstsiswa inner join mstkelas on mstsiswa.`id_kelas`=mstkelas.`id_kelas` WHERE mstkelas.`id_kelas`='{$id_kelas}' ORDER BY mstkelas.`tingkat`, mstkelas.`nama_kelas`, mstsiswa.`nama_lengkap` ASC;")->getResult();
+    }
+    
+    public function getdataKelas()
+    {
+        return $this->db->query("SELECT nama_kelas, id_kelas, tingkat FROM mstkelas ORDER BY tingkat, nama_kelas ASC;")->getResult();
     }
 }

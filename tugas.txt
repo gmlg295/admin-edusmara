@@ -14,7 +14,6 @@
 10. PELANGGARAN SISWA
 
 
-
 ========================= BIMA ========================= 
 
 1. KELAS
@@ -26,10 +25,21 @@
 
 
 
-
 ========================= IRFAN ========================= 
 
 1. MATA PELAJARAN
 2. JADWAL PELAJARAN
 3. ABSENSI
 4. JENIS MAPEL
+
+
+
+
+========================= Yang Belum  =========================
+
+1. LAPORAN
+    - LAPORAN PELANGGARAN
+    - LAPORAN SISWA BERPRESTASI
+    - LAPORAN REKAPITULASI ABSENSI
+    - LAPORAN KESISWAAN
+    

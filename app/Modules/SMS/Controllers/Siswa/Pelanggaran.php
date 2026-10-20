@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Controllers\Siswa;
+namespace App\Modules\SMS\Controllers\Siswa;
 use CodeIgniter\RESTful\ResourceController;
 
 class Pelanggaran extends ResourceController
 {
-    protected $modelName = 'App\Models\PelanggaranModel';
+    protected $modelName = 'App\Modules\SMS\Models\PelanggaranModel';
     protected $format    = 'json';
 
     // GET /kelas - Mengambil data dengan Pagination & Search
      public function index()
     {
-        return view('content/siswa/pelanggaran_siswa', [
+        return view('App\Modules\SMS\Views\content\siswa\pelanggaran_siswa', [
             'title' => 'Pelanggaran Siswa - EDUSMARA',
             'active' => 'master',
             'load_js' => 'page/siswa/pelanggaran_siswa.js',
@@ -24,11 +24,39 @@ class Pelanggaran extends ResourceController
     {
         return $this->respond([
             'status'  => true,
-            'kategori' => $this->model->getKategori(),
             'data'    => $this->model->getAllData(),
-            'total'   => $this->model->countAllResults(false)
         ]);
     }
+    
+    public function getDataConfig()
+    {
+        return $this->respond([
+            'status'  => true,
+            'jenis'    => $this->model->getdataJenisPelanggaran(),
+            'sub_jenis'    => $this->model->getdataSubJenisPelanggaran(),
+            'kelas'    => $this->model->getdataKelas(),
+            'tingkat_kasus'    => $this->model->getDataTingkatKasus(),
+            'terlambat'    => $this->model->getDataAlasanTerlambat(),
+            'sanksi'    => $this->model->getDataSanksi(),
+        ]);
+    }
+
+    public function getdataSiswa()
+    {
+        $kelas = $this->request->getGet('kelas');
+        if ($kelas != null && is_numeric($kelas)) {
+            return $this->respond([
+                'status'  => true,
+                'data'    => $this->model->getdataSiswa($kelas),
+            ]);
+        }
+
+        return $this->respond([
+            'status'  => false,
+            'data'    => [],
+        ]);
+    }
+
     // POST /kelas - Simpan Data Baru
     public function create()
     {

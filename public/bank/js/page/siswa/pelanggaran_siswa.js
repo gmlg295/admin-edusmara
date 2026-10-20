@@ -7,6 +7,151 @@ let vioData=JSON.parse(localStorage.getItem(STORAGE)||'[]');
 let currentMain='terlambat', currentSub='10', currentDetailId=null;
 let detailModalInst, deleteModalInst;
 
+const inputKelas=document.getElementById('inputKelas');
+const inputNamaSiswa=document.getElementById('inputNamaSiswa');
+const inputJenis=document.getElementById('inputJenis');
+const inputAlasanTerlambat=document.getElementById('inputAlasanTerlambat');
+const inputTingkatKasus=document.getElementById('inputTingkatKasus');
+const inputJenisKasus=document.getElementById('inputJenisKasus');
+const inputSanksi=document.getElementById('inputSanksi');
+let dataJenisPelanggaran={
+    'terlambat' : {
+            'id' : 1,
+            'label' : 'Terlambat',
+            'desc' : 'Datang melewati jam masuk'
+        },
+    'bolos' : {
+            'id' : 2,
+            'label' : 'Bolos',
+            'desc' : 'Bolos Sekolah'
+        },
+    'kasus' : {
+            'id' : 3,
+            'label' : 'Kasus',
+            'desc' : 'Kasus Ringan/Sedang/Berat'
+        }
+};
+
+let dataUji = [];
+
+function getDataConfig() {
+    const dataConfig =  new MyFetch('/sms/pelanggaran/getDataConfig');
+
+    try {
+        dataConfig.fetchData().then(result => {
+            if(result.status){
+                inputKelas.innerHTML = '<option value="">Pilih Kelas</option>';
+                const kelas = result.kelas;
+                kelas.forEach(r => {
+                    const option = document.createElement('option');
+                    option.value = r.id_kelas;
+                    option.textContent = `${r.tingkat} - ${r.nama_kelas}`;
+                    inputKelas.appendChild(option);
+                });
+
+                inputJenis.innerHTML = '<option value="">Pilih Jenis Pelanggaran</option>';
+                const jenis = result.jenis;
+                jenis.forEach(r => {
+                    const option = document.createElement('option');
+                    option.value = r.id_jenis_pelanggaran;
+                    option.textContent = `${r.nama_jenis}`;
+                    inputJenis.appendChild(option);
+                });
+
+                inputTingkatKasus.innerHTML = '<option value="">Pilih Tingkat Kasus</option>';
+                const tingkatKasus = result.tingkat_kasus;
+                tingkatKasus.forEach(r => {
+                    const option = document.createElement('option');
+                    option.value = r.id_tingkat_kasus;
+                    option.textContent = `${r.nama_tingkat}`;
+                    inputTingkatKasus.appendChild(option);
+                });
+
+                inputJenisKasus.innerHTML = '<option value="">Pilih Jenis Kasus</option>';
+                const jenisKasus = result.sub_jenis;
+                jenisKasus.forEach(r => {
+                    const option = document.createElement('option');
+                    option.value = r.id_sub_jenis;
+                    option.textContent = `${r.nama_sub_jenis}`;
+                    inputJenisKasus.appendChild(option);
+                });
+
+                inputSanksi.innerHTML = '<option value="">Pilih Sanksi</option>';
+                const sanksi = result.sanksi;
+                sanksi.forEach(r => {
+                    const option = document.createElement('option');
+                    option.value = r.id_sanksi;
+                    option.textContent = `${r.nama_sanksi}`;
+                    inputSanksi.appendChild(option);
+                });
+
+                inputAlasanTerlambat.innerHTML = '<option value="">Pilih Alasan Terlambat</option>';
+                const alasan = result.terlambat;
+                alasan.forEach(r => {
+                    const option = document.createElement('option');
+                    option.value = r.id_alasan_terlambat;
+                    option.textContent = `${r.nama_alasan}`;
+                    inputAlasanTerlambat.appendChild(option);
+                });
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+inputKelas.addEventListener('change', e => {
+    const kelas = e.target.value;
+    const dataSiswa =  new MyFetch('/sms/pelanggaran/getDataSiswa', { method: 'GET', params: { kelas: kelas } });
+
+    try {
+        dataSiswa.fetchData().then(result => {
+            if(result.status){
+                inputNamaSiswa.innerHTML = '<option value="">Pilih Siswa</option>';
+                const data = result.data;
+                data.forEach(r => {
+                    const option = document.createElement('option');
+                    option.value = r.id_siswa;
+                    option.textContent = `${r.nisn} - ${r.nama_lengkap}`;
+                    inputNamaSiswa.appendChild(option);
+                });
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+    }
+
+    // inputNamaSiswa.addEventListener('change', e => {
+    //     const namaSiswa = e.target.value;
+    //     const data = vioData.filter(d => d.id_siswa===namaSiswa);
+    //     renderData(data);
+    // })
+});
+
+function getSanksi() {
+    const jenjang =  new MyFetch('/mst/deleteGuru/' + id);
+
+    try {
+        jenjang.fetchData().then(result => {
+            if(result.status){
+                inputJenjang.innerHTML = '';
+                const data = result.data;
+                data.forEach(r => {
+                    const option = document.createElement('option');
+                    option.value = r.id_kelas;
+                    option.textContent = `${r.tingkat} - ${r.nama_kelas}`;
+                    inputJenjang.appendChild(option);
+                });
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 // Seed demo
 if(vioData.length===0){
     vioData=[
@@ -20,7 +165,7 @@ if(vioData.length===0){
     ];
     saveData();
 }
-
+ 
 // ============ INIT ============
 document.addEventListener('DOMContentLoaded',()=>{
     detailModalInst=new bootstrap.Modal(document.getElementById('detailModal'));
@@ -32,6 +177,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('inputTanggal').value=new Date().toISOString().split('T')[0];
     updateAllCounts();
     renderCurrentView();
+    getDataConfig();
 });
 
 // ============ MAIN TABS ============

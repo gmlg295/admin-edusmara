@@ -15,7 +15,7 @@ class Agenda extends ResourceController
             'title' => 'Agenda - EDUSMARA',
             'active' => 'agenda',
             'load_js' => 'page/master/agenda.js',
-            'load_css' => 'page/master/pengumuman-style.css',
+            'load_css' => 'page/master/agenda-style.css',
             'enable_menu' => false,
         ]);
     }
@@ -41,8 +41,8 @@ class Agenda extends ResourceController
     // POST /kelas - Simpan Data Baru
     public function create()
     {
-        $input = $this->request->getPost() ?? []; // Ambil data JSON$this->request->getPost();
-        
+        $input = $this->request->getJSON(true) ?? []; // Ambil data JSON$this->request->getPost();
+        helper('fungsi_helper');
         if (!$this->validate($this->model->validationRules)) {
             return $this->response->setStatusCode(422)->setJSON([
                 'csrf_token' => csrf_token(),
@@ -59,21 +59,15 @@ class Agenda extends ResourceController
         if ($files && $files->isValid() && !$files->hasMoved()) {
             $newName = $files->getRandomName();
             $files->move('./public/bank/sampel/', $newName);
-            $input['gambar_header'] = $newName; // Set nama file ke input
+            $input['gambar'] = $newName; // Set nama file ke input
         } else {
-            $input['gambar_header'] = null; // Jika tidak ada file, set null
+            $input['gambar'] = null; // Jika tidak ada file, set null
         }
-
-        $input['id_penulis'] = session()->get('user_id'); // Set id_penulis dari session
-        $input['id_kategori_informasi'] = (int) $input['kategori'] ?? 1; // Set id_kategori_informasi dari request
+        $input['id_jenis_agenda'] = 1; // Set id_kategori_informasi dari request
         $input['status'] = $input['status'] ?? 'draft'; // Set status dari request, default 'draft'
-        $input['slug'] = url_title($input['judul'], '-', true); // Generate slug dari judul
-        $input['ringkasan'] = substr(strip_tags($input['konten']), 0, 100); // Generate ringkasan dari konten
-        $input['gambar_header'] = $input['gambar_header'] ?? null; // Set gambar_header dari request
-        $input['jumlah_dibaca'] = 0; // Set jumlah_dibaca
-        $input['jumlah_disukai'] = 0; // Set jumlah_disukai
-        $input['published_at'] = ($input['status'] === 'publish') ? date('Y-m-d H:i:s') : null; // Set published_at jika status publish
-        $input['archived_at'] = ($input['status'] === 'archive') ? date('Y-m-d H:i:s') : null; // Set archived_at jika status archive   
+        $input['slug'] = url_title($input['judul'], '-', true); 
+        $input['published_at'] = ($input['status'] === 'publish') ? waktu() : null; // Set published_at jika status publish
+        $input['archived_at'] = ($input['status'] === 'archive') ? waktu() : null; // Set archived_at jika status archive   
 
 
         $id = $this->model->insert($input);
@@ -88,35 +82,30 @@ class Agenda extends ResourceController
     // PUT/PATCH /kelas/{id} - Update Data
     public function update($id = null)
     {
-        $input = $this->request->getPost() ?? [];
+        $input = $this->request->getJSON(true) ?? [];
 
         if (!$id || !is_numeric($id)) {
             return $this->failValidationErrors(['id' => 'ID kelas tidak valid']);
         }
 
         if($input['isUpdateFile'] === 'true') {
-            $files = $this->request->getFile('files');
-            if ($files && $files->isValid() && !$files->hasMoved()) {
-                $newName = $files->getRandomName();
-                $files->move('./public/bank/sampel/', $newName);
-                $input['gambar_header'] = $newName; // Set nama file ke input
-            } else {
-                $input['gambar_header'] = null; // Jika tidak ada file, set null
-            }
+                $files = $this->request->getFile('files');
+                if ($files && $files->isValid() && !$files->hasMoved()) {
+                    $newName = $files->getRandomName();
+                    $files->move('./public/bank/sampel/', $newName);
+                    $input['gambar'] = $newName; // Set nama file ke input
+                } else {
+                    $input['gambar'] = null; // Jika tidak ada file, set null
+                }
         } else {
-            unset($input['gambar_header']); // Jangan update gambar_header jika tidak ada file baru
+            unset($input['gambar']); // Jangan update gambar_header jika tidak ada file baru
         }
 
-        $input['id_penulis'] = session()->get('user_id'); // Set id_penulis dari session
-        $input['id_kategori_informasi'] = (int) $input['kategori'] ?? 1; // Set id_kategori_informasi dari request
+        $input['id_jenis_agenda'] = $input['id_jenis_agenda'] ?? 1; // Set id_kategori_informasi dari request
         $input['status'] = $input['status'] ?? 'draft'; // Set status dari request, default 'draft'
-        $input['slug'] = url_title($input['judul'], '-', true); // Generate slug dari judul
-        $input['ringkasan'] = substr(strip_tags($input['konten']), 0, 100); // Generate ringkasan dari konten
-        $input['gambar_header'] = $input['gambar_header'] ?? null; // Set gambar_header dari request
-        $input['jumlah_dibaca'] = 0; // Set jumlah_dibaca
-        $input['jumlah_disukai'] = 0; // Set jumlah_disukai
-        $input['published_at'] = ($input['status'] === 'publish') ? date('Y-m-d H:i:s') : null; // Set published_at jika status publish
-        $input['archived_at'] = ($input['status'] === 'archive') ? date('Y-m-d H:i:s') : null; // Set archived_at jika status archive   
+        $input['slug'] = url_title($input['judul'], '-', true); 
+        $input['published_at'] = ($input['status'] === 'publish') ? waktu() : null; // Set published_at jika status publish
+        $input['archived_at'] = ($input['status'] === 'archive') ? waktu() : null; // Set archived_at jika status archive   
 
         
         if (!$this->validate($this->model->validationRules)) {
@@ -145,7 +134,7 @@ class Agenda extends ResourceController
         if (!$id || !is_numeric($id)) {
             return $this->failValidationErrors(['id' => 'ID kelas tidak valid']);
         }
-        $this->model->where('id_informasi', $id)->delete();        
+        $this->model->where('id_agenda', $id)->delete();        
         return $this->respondDeleted(['status' => true, 'message' => 'Data berhasil dihapus']);
     }
 

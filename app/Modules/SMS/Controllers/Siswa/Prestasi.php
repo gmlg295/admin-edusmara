@@ -19,7 +19,7 @@ class Prestasi extends ResourceController
             'enable_menu' => false,
         ]);
     }
-
+ 
     public function getData()
     {
         return $this->respond([

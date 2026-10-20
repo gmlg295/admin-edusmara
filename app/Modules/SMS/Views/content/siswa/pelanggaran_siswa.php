@@ -24,7 +24,7 @@
         <div class="main-tab terlambat active" data-main="terlambat">
             <span class="tab-count" id="countMainTerlambat">0</span>
             <div class="tab-icon"><i class="fa-solid fa-clock"></i></div>
-            <div class="tab-label">Terlambat</div>
+            <div class="tab-label">Terlambat</div> 
             <div class="tab-desc">Datang melewati jam masuk</div>
         </div>
         <div class="main-tab bolos" data-main="bolos">
@@ -90,13 +90,11 @@
 
                     <div class="form-section">
                         <div class="form-section-title"><i class="fa-solid fa-user-graduate"></i><span>Data Siswa</span></div>
-                        <div class="form-group">
-                            <label class="form-label-custom">Nama Siswa <span class="required">*</span></label>
-                            <input type="text" class="form-control-custom" id="inputNama" placeholder="Ketik nama siswa..." required>
-                        </div>
-                        <div class="form-row three-col">
+
+                        <div class="form-row two-col">
+                            
                             <div class="form-group">
-                                <label class="form-label-custom">Kelas <span class="required">*</span></label>
+                                <label class="form-label-custom">Nama Kelas <span class="required">*</span></label>
                                 <select class="form-control-custom" id="inputKelas" required>
                                     <option value="">Pilih</option>
                                     <option value="10">Kelas 10</option>
@@ -104,17 +102,32 @@
                                     <option value="12">Kelas 12</option>
                                 </select>
                             </div>
+
                             <div class="form-group">
-                                <label class="form-label-custom">Nama Kelas <span class="required">*</span></label>
-                                <select class="form-control-custom" id="inputNamaKelas" required><option value="">Pilih Rombel</option></select>
+                                <label class="form-label-custom">Nama Siswa (NISN) <span class="required">*</span></label>
+                                <select class="form-control-custom" id="inputNamaSiswa" required>
+                                    <option value="">Pilih Siswa</option>
+                                   
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row three-col">
+                            <div class="form-group">
+                                <label class="form-label-custom">Nama Lengkap / NISN <span class="required">*</span></label>
+                                <input type="text" class="form-control-custom" id="inputNama" placeholder="Ketik nama siswa..." required>
                             </div>
                             <div class="form-group">
+                                <label class="form-label-custom">Kelas/Ruang <span class="required">*</span></label>
+                                <input type="text" class="form-control-custom" id="inputNamaKelas" placeholder="Ketik nama siswa..." required>
+                            </div>
+                            
+                            <div class="form-group">
                                 <label class="form-label-custom">Jenis Kelamin <span class="required">*</span></label>
-                                <select class="form-control-custom" id="inputGender" required>
-                                    <option value="">Pilih</option>
-                                    <option value="L">Laki-laki</option>
-                                    <option value="P">Perempuan</option>
-                                </select>
+                                <input type="text" class="form-control-custom" id="inputNama" placeholder="Ketik nama siswa..." required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label-custom">Alamat <span class="required">*</span></label>
+                                <input type="text" class="form-control-custom" id="inputNama" placeholder="Ketik nama siswa..." required>
                             </div>
                         </div>
                     </div>
@@ -126,9 +139,7 @@
                                 <label class="form-label-custom">Jenis Pelanggaran <span class="required">*</span></label>
                                 <select class="form-control-custom" id="inputJenis" required>
                                     <option value="">Pilih Jenis</option>
-                                    <option value="terlambat">⏰ Terlambat</option>
-                                    <option value="bolos">🚪 Bolos Sekolah</option>
-                                    <option value="kasus">⚖️ Kasus Sedang / Berat</option>
+                                   
                                 </select>
                             </div>
                             <div class="form-group">
@@ -184,7 +195,7 @@
 
                         <!-- Field khusus Kasus -->
                         <div class="conditional-field" id="fieldKasus">
-                            <div class="form-row">
+                            <div class="form-row three-col">
                                 <div class="form-group">
                                     <label class="form-label-custom">Tingkat Kasus <span class="required">*</span></label>
                                     <select class="form-control-custom" id="inputTingkatKasus">
@@ -212,21 +223,21 @@
                                         <option value="Lainnya">Lainnya</option>
                                     </select>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label-custom">Tindakan / Sanksi yang Diberikan</label>
-                                <select class="form-control-custom" id="inputSanksi">
-                                    <option value="">Pilih Sanksi</option>
-                                    <option value="Teguran lisan">Teguran Lisan</option>
-                                    <option value="Teguran tertulis">Teguran Tertulis</option>
-                                    <option value="Surat peringatan 1">Surat Peringatan 1</option>
-                                    <option value="Surat peringatan 2">Surat Peringatan 2</option>
-                                    <option value="Surat peringatan 3">Surat Peringatan 3</option>
-                                    <option value="Pemanggilan orang tua">Pemanggilan Orang Tua</option>
-                                    <option value="Skorsing 3 hari">Skorsing 3 Hari</option>
-                                    <option value="Skorsing 7 hari">Skorsing 7 Hari</option>
-                                    <option value="Dikeluarkan">Dikeluarkan dari sekolah</option>
-                                </select>
+                                <div class="form-group">
+                                    <label class="form-label-custom">Tindakan / Sanksi yang Diberikan</label>
+                                    <select class="form-control-custom" id="inputSanksi">
+                                        <option value="">Pilih Sanksi</option>
+                                        <option value="Teguran lisan">Teguran Lisan</option>
+                                        <option value="Teguran tertulis">Teguran Tertulis</option>
+                                        <option value="Surat peringatan 1">Surat Peringatan 1</option>
+                                        <option value="Surat peringatan 2">Surat Peringatan 2</option>
+                                        <option value="Surat peringatan 3">Surat Peringatan 3</option>
+                                        <option value="Pemanggilan orang tua">Pemanggilan Orang Tua</option>
+                                        <option value="Skorsing 3 hari">Skorsing 3 Hari</option>
+                                        <option value="Skorsing 7 hari">Skorsing 7 Hari</option>
+                                        <option value="Dikeluarkan">Dikeluarkan dari sekolah</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 

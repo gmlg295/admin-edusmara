@@ -93,7 +93,7 @@
         showToast('info', 'Navigasi', `Menuju halaman ${title}`);
 
         setTimeout(() => {
-            window.location.href = `/${page}`;
+            window.location.href = `/sms/${page}`;
         }, 500);
         
         // Di production, gunakan: window.location.href = `/admin/${page}`;

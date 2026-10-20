@@ -2,41 +2,50 @@
 (function(){
 'use strict';
 
-const STORAGE_KEY = 'smantique_pengumuman';
-let annData =[]; // JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-let currentDetailId = null;
-let detailModalInst, deleteModalInst;
-
-const categoryConfig = {
-    pengumuman:   { icon:'fa-bullhorn', label:'Pengumuman' },
-    pemberitahuan:{ icon:'fa-clipboard-list', label:'Pemberitahuan' },
-    himbauan:     { icon:'fa-bullhorn', label:'Himbauan' },
-    undangan:     { icon:'fa-envelope-open-text', label:'Undangan' },
-    edaran:       { icon:'fa-file-lines', label:'Edaran' },
-    lainnya:      { icon:'fa-pen-nib', label:'Lainnya' }
+const CAT_CONFIG = {
+    akademik:{label:'Akademik',icon:'fa-book-open',color:'#1e40af'},
+    ujian:{label:'Ujian',icon:'fa-file-pen',color:'#ef4444'},
+    ekskul:{label:'Ekstrakurikuler',icon:'fa-futbol',color:'#10b981'},
+    rapat:{label:'Rapat',icon:'fa-users',color:'#06b6d4'},
+    libur:{label:'Libur',icon:'fa-umbrella-beach',color:'#8b5cf6'}
 };
+const STATUS_LABELS = {mendatang:'Mendatang',berlangsung:'Berlangsung',selesai:'Selesai',dibatalkan:'Dibatalkan',draft:'Draft', published:'Dipublikasi'};
+const PRIORITY_LABELS = {normal:'Normal',tinggi:'⭐ Tinggi',darurat:'🔴 Darurat'};
+const TARGET_LABELS = {semua:'Semua Warga Sekolah',siswa:'Siswa',guru:'Guru & Staff',ortu:'Orang Tua / Wali',kelas12:'Kelas XII',undangan:'Tamu Undangan'};
+let agendaData = [];
+// // Demo data matching frontend agenda
+// let agendaData = [
+//     {id:1,title:'Rapat Koordinasi Panitia 17 Agustus',category:'rapat',dateStart:'2026-08-16',dateEnd:'',timeStart:'14:00',timeEnd:'16:00',fullDay:false,location:'Ruang Guru',target:'guru',estPeserta:12,participants:'Kepala Sekolah, Wakasek, Panitia HUT RI',desc:'Rapat koordinasi final persiapan upacara HUT RI ke-81. Membahas rundown acara, pembagian tugas, dan pengecekan peralatan.',priority:'tinggi',countdown:false,reminder:true,status:'upcoming',createdAt:'2026-08-10T09:00:00Z'},
+//     {id:2,title:'Latihan Paskibra - Persiapan HUT RI',category:'ekskul',dateStart:'2026-08-16',dateEnd:'',timeStart:'15:30',timeEnd:'17:30',fullDay:false,location:'Lapangan Utama',target:'siswa',estPeserta:48,participants:'Anggota Paskibra, Pelatih',desc:'Gladi bersih terakhir sebelum upacara HUT RI ke-81. Fokus pada formasi dan sinkronisasi gerakan.',priority:'tinggi',countdown:false,reminder:false,status:'upcoming',createdAt:'2026-08-10T09:00:00Z'},
+//     {id:3,title:'Upacara HUT Kemerdekaan RI ke-81',category:'akademik',dateStart:'2026-08-17',dateEnd:'',timeStart:'07:00',timeEnd:'09:00',fullDay:false,location:'Lapangan Utama',target:'semua',estPeserta:800,participants:'Seluruh Siswa, Guru, Staf, Tamu Undangan',desc:'Upacara bendera memperingati HUT Kemerdekaan RI ke-81. Dilanjutkan dengan lomba-lomba tradisional antar kelas.',priority:'tinggi',countdown:true,reminder:true,status:'upcoming',createdAt:'2026-08-01T08:00:00Z'},
+//     {id:4,title:'Lomba Tradisional Antar Kelas',category:'ekskul',dateStart:'2026-08-17',dateEnd:'',timeStart:'09:30',timeEnd:'12:00',fullDay:false,location:'Lapangan Utama & Halaman Sekolah',target:'siswa',estPeserta:800,participants:'Seluruh Kelas X, XI, XII',desc:'Lomba tradisional: balap karung, tarik tambang, makan kerupuk, panjat pinang. Pemenang mendapat trophy dan hadiah menarik.',priority:'normal',countdown:false,reminder:false,status:'upcoming',createdAt:'2026-08-01T08:00:00Z'},
+//     {id:5,title:'Libur Isra Mi\'raj Nabi Muhammad SAW',category:'libur',dateStart:'2026-08-20',dateEnd:'',timeStart:'',timeEnd:'',fullDay:true,location:'Seluruh Wilayah Indonesia',target:'semua',estPeserta:0,participants:'Seluruh warga sekolah',desc:'Libur nasional peringatan Isra Mi\'raj Nabi Muhammad SAW 1448 H. Kegiatan belajar mengajar diliburkan.',priority:'normal',countdown:false,reminder:false,status:'upcoming',createdAt:'2026-07-15T08:00:00Z'},
+//     {id:6,title:'Asesmen Sumatif Tengah Semester (ASTS) Ganjil',category:'ujian',dateStart:'2026-08-25',dateEnd:'2026-09-05',timeStart:'07:30',timeEnd:'12:00',fullDay:false,location:'Ruang Kelas Masing-masing',target:'siswa',estPeserta:800,participants:'Seluruh Siswa Kelas X, XI, XII',desc:'Pelaksanaan ASTS Semester Ganjil TP 2026/2027. Jadwal mata ujian akan dibagikan oleh wali kelas masing-masing.',priority:'tinggi',countdown:true,reminder:true,status:'upcoming',createdAt:'2026-07-20T08:00:00Z'},
+//     {id:7,title:'Sosialisasi Kurikulum Merdeka Belajar',category:'akademik',dateStart:'2026-08-25',dateEnd:'',timeStart:'13:00',timeEnd:'15:00',fullDay:false,location:'Aula Sekolah',target:'guru',estPeserta:45,participants:'Guru Mata Pelajaran',desc:'Sosialisasi implementasi Kurikulum Merdeka Belajar untuk semester ganjil oleh narasumber dari Dinas Pendidikan.',priority:'normal',countdown:false,reminder:true,status:'upcoming',createdAt:'2026-08-05T08:00:00Z'},
+// ];
+let nextId = 100;
+let detailModalInst, deleteModalInst;
+let currentDetailId = null;
 
-const targetLabels = { semua:'Semua', siswa:'Siswa', guru:'Guru & Staff', ortu:'Orang Tua', kelas12:'Kelas XII' };
-const priorityLabels = { normal:'Normal', penting:'⭐ Penting', darurat:'🔴 Darurat' };
 const ApiData =  new MyFetch('/sms/agenda/getData', { method: 'GET'});
 // Seed demo
     async function loadDataFromServer() {
         try {
             const result = await ApiData.fetchData();
                 if(result.status){
-                    annData = result.data;
+                    agendaData = result.data;
                     setTimeout(() => {
                         renderList();
                         updateSummary();
                     }, 500);
 
-                    const kategoriSelect = document.getElementById('inputKategori');
+                    const kategoriSelect = document.getElementById('fCategory');
                     const kategori = result.kategori;
                                     kategoriSelect.innerHTML = '';
                                     kategori.forEach(kat => {
                                         const option = document.createElement('option');
-                                        option.value = kat.id_kategori_informasi;
-                                        option.textContent = kat.nama_kategori;
+                                        option.value = kat.id_jenis_agenda;
+                                        option.textContent = kat.nama_jenis;
                                         kategoriSelect.appendChild(option);
                                     });
                 };
@@ -48,26 +57,18 @@ const ApiData =  new MyFetch('/sms/agenda/getData', { method: 'GET'});
         }
     }   
 
-// if(annData.length===0){
-//     annData = [
-//         { id:1, judul:'Pemberitahuan Tentang Pelaksanaan Ujian Praktik Kelas XII Tahun 2026', kategori:'pemberitahuan', tanggal:'2026-02-08', penulis:'Wakil Kepala Sekolah Bidang Kurikulum', konten:'Assalamualaikum warahmatullahi wabarakatuh.\n\nKami informasikan bahwa Pelaksanaan Ujian Praktik Kelas XII TP 2025/2026 akan dilaksanakan pada:\n\n- Tanggal: 2 s.d. 13 Maret 2026\n- Pukul: 07:30 – 12:00 WIB\n- Tempat: Ruang Kelas & Laboratorium\n\nSiswa wajib hadir tepat waktu dan membawa peralatan praktik sesuai mata ujian.\n\n⚠️ PERHATIAN:\nKeterlambatan lebih dari 15 menit tanpa alasan sah akan dianggap tidak mengikuti ujian.\n\nWassalamualaikum warahmatullahi wabarakatuh.', target:'semua', prioritas:'penting', status:'published', createdAt:'2026-02-08T09:30:00Z' },
-//         { id:2, judul:'Himbauan Kepada Orang Tua untuk Selalu Memberikan Pendampingan kepada Ananda', kategori:'himbauan', tanggal:'2025-11-11', penulis:'Kepala Sekolah', konten:'Assalamualaikum warahmatullahi wabarakatuh.\n\nAyah/Bunda, kami berharap kerjasamanya untuk terus memantau kegiatan ananda di rumah dalam proses pembelajaran.\n\nℹ️ INFORMASI:\nBeberapa hal yang perlu diperhatikan:\n1. Pastikan ananda belajar minimal 2 jam sehari\n2. Pantau penggunaan gadget\n3. Komunikasi aktif dengan wali kelas\n\nTerima kasih atas kerjasama Ayah/Bunda.', target:'ortu', prioritas:'normal', status:'published', createdAt:'2025-11-11T08:00:00Z' },
-//         { id:3, judul:'Undangan Rapat Koordinasi Wali Murid Kelas XII', kategori:'undangan', tanggal:'2026-02-20', penulis:'Humas SMAN 3', konten:'Dengan hormat,\n\nMengharap kehadiran Bapak/Ibu Wali Murid Kelas XII pada:\n\n- Hari/Tanggal: Sabtu, 28 Februari 2026\n- Pukul: 09:00 – 11:00 WIB\n- Tempat: Aula SMAN 3 Bengkulu Tengah\n- Agenda: Sosialisasi Ujian Sekolah & Persiapan Kelulusan\n\nDemikian undangan ini kami sampaikan. Atas kehadirannya kami ucapkan terima kasih.', target:'ortu', prioritas:'penting', status:'published', createdAt:'2026-02-20T10:00:00Z' },
-//         { id:4, judul:'Edaran Larangan Membawa Handphone Selama ASAS', kategori:'edaran', tanggal:'2025-05-24', penulis:'Kepala Sekolah', konten:'Assalamualaikum wr wb.\n\nSehubungan akan dilaksanakannya Assesmen Akhir Semester (ASAS) Genap TP 2024-2025, dengan ini diberitahukan bahwa:\n\n⚠️ PERHATIAN:\nSelama pelaksanaan ASAS, siswa DILARANG membawa handphone ke lingkungan sekolah.\n\nPelanggaran terhadap ketentuan ini akan dikenakan sanksi sesuai tata tertib sekolah.\n\nWassalamualaikum wr wb.', target:'siswa', prioritas:'darurat', status:'published', createdAt:'2025-05-24T14:00:00Z' },
-//         { id:5, judul:'Pengumuman Libur Isra Mi\'raj Nabi Muhammad SAW 1448 H', kategori:'pengumuman', tanggal:'2026-08-18', penulis:'Admin', konten:'Diberitahukan kepada seluruh warga sekolah bahwa dalam rangka peringatan Isra Mi\'raj Nabi Muhammad SAW 1448 H, kegiatan belajar mengajar diliburkan pada:\n\n- Hari: Kamis, 20 Agustus 2026\n- Kegiatan masuk kembali: Jumat, 21 Agustus 2026\n\nDemikian disampaikan, terima kasih.', target:'semua', prioritas:'normal', status:'draft', createdAt:'2026-08-18T09:00:00Z' }
-//     ];
-//     //saveData();
-// }
-
 // ============ INIT ============
 document.addEventListener('DOMContentLoaded',()=>{
     detailModalInst = new bootstrap.Modal(document.getElementById('detailModal'));
     deleteModalInst = new bootstrap.Modal(document.getElementById('deleteModal'));
     loadDataFromServer();
     initTabs();
-    updateSummary();
     renderList();
-    document.getElementById('inputTanggal').value = new Date().toISOString().split('T')[0];
+    updateSummary();
+    document.getElementById('fDateStart').value = new Date().toISOString().split('T')[0];
+    document.getElementById('searchInput').addEventListener('input',renderList);
+    document.getElementById('filterCat').addEventListener('change',renderList);
+    document.getElementById('filterStatus').addEventListener('change',renderList);
 });
 
 function initTabs(){
@@ -81,216 +82,211 @@ function initTabs(){
     });
 }
 
-window.switchToForm = function(editId=null){
-    document.querySelectorAll('.page-tab').forEach(t=>t.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-    document.querySelector('[data-tab="form"]').classList.add('active');
-    document.getElementById('tab-form').classList.add('active');
-    if(editId) loadEditForm(editId);
-    else resetForm();
-};
-
 // ============ RENDER LIST ============
-window.renderList = function(){
-    const list = document.getElementById('annList');
-    const search = document.getElementById('searchAnn').value.toLowerCase().trim();
-    const fCat = document.getElementById('filterCategory').value;
+function renderList(){
+    const container = document.getElementById('agendaList');
+    const search = document.getElementById('searchInput').value.toLowerCase().trim();
+    const fCat = document.getElementById('filterCat').value;
     const fStat = document.getElementById('filterStatus').value;
 
-    let filtered = annData.filter(a=>{
-        const ms = !search || a.judul.toLowerCase().includes(search);
-        const mc = fCat==='all' || a.kategori===fCat;
+    let filtered = agendaData.filter(a=>{
+        const ms = !search || a.title.toLowerCase().includes(search);
+        const mc = fCat==='all' || a.category===fCat;
         const mst = fStat==='all' || a.status===fStat;
         return ms && mc && mst;
-    }).sort((a,b)=>new Date(b.tanggal)-new Date(a.tanggal));
+    }).sort((a,b)=>new Date(a.dateStart)-new Date(b.dateStart));
 
     if(filtered.length===0){
-        list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-inbox"></i><h4>Tidak Ada Data</h4><p>${annData.length===0?'Belum ada pengumuman. Klik "Buat Pengumuman" untuk memulai.':'Tidak ada pengumuman yang cocok dengan filter.'}</p></div>`;
+        container.innerHTML=`<div class="empty-state"><i class="fa-solid fa-calendar-xmark"></i><h4>Tidak Ada Agenda</h4><p>${agendaData.length===0?'Belum ada agenda. Klik "Tambah Agenda" untuk memulai.':'Tidak ada agenda yang cocok dengan filter.'}</p></div>`;
         return;
     }
 
-    list.innerHTML = filtered.map((a,idx)=>{
-        const cfg = categoryConfig[a.kategori.toLowerCase()] || categoryConfig.lainnya;
-        return `
-        <div class="ann-card cat-${a.kategori.toLowerCase()}" style="animation-delay:${idx*0.04}s" onclick="showDetail(${a.id_informasi})">
-            <div class="ann-icon ${a.kategori.toLowerCase()}"><i class="fa-solid ${cfg.icon}"></i></div>
-            <div class="ann-body">
-                <div class="ann-top">
-                    <span class="ann-category ${a.kategori}"><i class="fa-solid ${cfg.icon}"></i> ${cfg.label}</span>
-                    <span class="ann-status ${a.status}">${a.status==='published'?'✅ Publikasi':'📝 Draft'}</span>
+    container.innerHTML = filtered.map((a,idx)=>{
+        const d = new Date(a.dateStart);
+        const day = d.getDate();
+        const month = d.toLocaleDateString('id-ID',{month:'short'});
+        const catCfg = CAT_CONFIG[a.category]||CAT_CONFIG.akademik;
+        const dateBoxClass = a.category==='libur'?'libur':a.category==='ujian'?'ujian':'';
+
+        return `<div class="ag-card cat-${a.category}" style="animation-delay:${idx*0.04}s" onclick="showDetail(${a.id})">
+            <div class="ag-date-box ${dateBoxClass}">
+                <div class="day">${day}</div>
+                <div class="month">${month}</div>
+            </div>
+            <div class="ag-body">
+                <div class="ag-top">
+                    <span class="ag-badge ${a.category}"><i class="fa-solid ${catCfg.icon}"></i> ${catCfg.label}</span>
+                    <span class="ag-status ${a.status}">${STATUS_LABELS[a.status]||a.status}</span>
                 </div>
-                <div class="ann-title">${a.judul}</div>
-                <div class="ann-excerpt">${a.konten.substring(0,120).replace(/\n/g,' ')}...</div>
-                <div class="ann-meta">
-                    <span><i class="fa-regular fa-calendar"></i> ${formatDate(a.tanggal_publikasi)}</span>
-                    <span><i class="fa-solid fa-user-pen"></i> ${a.penulis||'Admin'}</span>
-                    <span><i class="fa-solid fa-users"></i> ${targetLabels[a.target_pembaca]||'Semua'}</span>
+                <div class="ag-title">${a.title}</div>
+                <div class="ag-meta">
+                    <span><i class="fa-solid fa-location-dot"></i> ${a.location}</span>
+                    ${a.timeStart?`<span><i class="fa-regular fa-clock"></i> ${a.timeStart}${a.timeEnd?' - '+a.timeEnd:''}</span>`:'<span><i class="fa-solid fa-sun"></i> Full Day</span>'}
+                    ${a.priority!=='normal'?`<span><i class="fa-solid fa-flag"></i> ${PRIORITY_LABELS[a.priority]||a.priority}</span>`:''}
                 </div>
             </div>
-            <div class="ann-actions" onclick="event.stopPropagation()">
-                <button class="action-btn view" onclick="showDetail(${a.id_informasi})" title="Detail"><i class="fa-solid fa-eye"></i></button>
-                <button class="action-btn edit" onclick="switchToForm(${a.id_informasi})" title="Edit"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-btn delete" onclick="openDeleteDirect(${a.id_informasi})" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+            <div class="ag-actions" onclick="event.stopPropagation()">
+                <button class="act-btn view" onclick="showDetail(${a.id})" title="Detail"><i class="fa-solid fa-eye"></i></button>
+                <button class="act-btn edit" onclick="openEditForm(${a.id})" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                <button class="act-btn delete" onclick="openDeleteConfirm(${a.id})" title="Hapus"><i class="fa-solid fa-trash"></i></button>
             </div>
         </div>`;
     }).join('');
-};
+}
 
-document.getElementById('searchAnn').addEventListener('input',renderList);
-document.getElementById('filterCategory').addEventListener('change',renderList);
-document.getElementById('filterStatus').addEventListener('change',renderList);
+// ============ SUMMARY ============
+function updateSummary(){
+    document.getElementById('sumTotal').textContent = agendaData.length;
+    document.getElementById('sumUpcoming').textContent = agendaData.filter(a=>a.status==='mendatang').length;
+    document.getElementById('sumOngoing').textContent = agendaData.filter(a=>a.status==='berlangsung').length;
+    document.getElementById('sumDone').textContent = agendaData.filter(a=>a.status==='selesai').length;
+}
 
 // ============ SHOW DETAIL ============
 window.showDetail = function(id){
-    const a = annData.find(x=>x.id_informasi==id);
+    const a = agendaData.find(x=>x.id===id);
     if(!a) return;
-    currentDetailId = a.id_informasi;
-    const cfg = categoryConfig[a.kategori.toLowerCase()]||categoryConfig.lainnya;
+    currentDetailId = id;
+    const catCfg = CAT_CONFIG[a.category]||CAT_CONFIG.akademik;
 
-    document.getElementById('mCategoryBadge').innerHTML = `<span class="ann-category ${a.kategori.toLowerCase()}" style="font-size:11px;padding:4px 12px;"><i class="fa-solid ${cfg.icon}"></i> ${cfg.label}</span>`;
-    document.getElementById('mTitle').textContent = a.judul;
-    document.getElementById('mDate').textContent = formatDateLong(a.tanggal_publikasi);
-    document.getElementById('mCat').textContent = cfg.label;
-    document.getElementById('mStatus').textContent = a.status==='published'?'✅ Dipublikasi':'📝 Draft';
-    document.getElementById('mAuthor').textContent = a.penulis||'Admin';
-    document.getElementById('mTarget').textContent = targetLabels[a.target_pembaca]||'Semua';
-    document.getElementById('mPriority').textContent = priorityLabels[a.prioritas]||'Normal';
-    document.getElementById('mCreated').textContent = a.created_at ? new Date(a.created_at).toLocaleString('id-ID') : '-';
-    document.getElementById('mContent').textContent = a.konten;
+    document.getElementById('mBadge').innerHTML = `<span class="ag-badge ${a.category}" style="font-size:11px;padding:4px 12px"><i class="fa-solid ${catCfg.icon}"></i> ${catCfg.label}</span>`;
+    document.getElementById('mTitle').textContent = a.title;
+    document.getElementById('mDate').textContent = formatDateRange(a.dateStart,a.dateEnd);
+    document.getElementById('mTime').textContent = a.fullDay ? 'Seharian Penuh' : `${a.timeStart||'-'} - ${a.timeEnd||'-'}`;
+    document.getElementById('mLoc').textContent = a.location;
+    document.getElementById('mTarget').textContent = TARGET_LABELS[a.target]||a.target;
+    document.getElementById('mPriority').textContent = PRIORITY_LABELS[a.priority]||a.priority;
+    document.getElementById('mStatus').textContent = STATUS_LABELS[a.status]||a.status;
+    document.getElementById('mEst').textContent = a.estPeserta ? `${a.estPeserta} orang` : '-';
+    document.getElementById('mDesc').textContent = a.desc;
 
-    if(a.gambar_header){
-        document.getElementById('mImage').src = `./public/bank/sampel/${a.gambar_header}`;
-        document.getElementById('mImage').style.display = 'block';
-    }else{
-        document.getElementById('mImage').src = '#';
-        document.getElementById('mImage').style.display = 'none';
-    }
+    const partRow = document.getElementById('mPartRow');
+    if(a.participants){partRow.style.display='flex';document.getElementById('mPart').textContent=a.participants;}
+    else{partRow.style.display='none';}
 
     detailModalInst.show();
 };
 
-window.openEditFromModal = function(){
+window.editFromModal = function(){
     detailModalInst.hide();
-    setTimeout(()=>switchToForm(currentDetailId),300);
+    setTimeout(()=>openEditForm(currentDetailId),300);
 };
 
-const inputFiles = document.getElementById('inputFiles');
-const imagePreview = document.getElementById('imagePreview');
-const annForm = document.getElementById('annForm');
+window.deleteFromModal = function(){
+    detailModalInst.hide();
+    setTimeout(()=>openDeleteConfirm(currentDetailId),300);
+};
 
-inputFiles.addEventListener('change',function(e){
-    const file = e.target.files[0];
-    if(file){
-        const reader = new FileReader();
-        reader.onload = function(e){
-            imagePreview.src = e.target.result;
-        }
-        reader.readAsDataURL(file);
-        imagePreview.style.display = 'block';
-    }else{
-        imagePreview.src = '#';
-        imagePreview.style.display = 'none';
-    }
-});
+// ============ FORM: ADD ============
+window.openAddForm = function(){
+    resetForm();
+    document.getElementById('formTitle').innerHTML = '<i class="fa-solid fa-calendar-plus"></i> Tambah Agenda Baru';
+    document.getElementById('formSubtitle').textContent = 'Lengkapi informasi agenda sebelum dipublikasikan';
+    switchTab('form');
+};
 
-// ============ FORM ============
-function loadEditForm(id){
-    const a = annData.find(x=>x.id_informasi==id);
+// ============ FORM: EDIT ============
+window.openEditForm = function(id){
+    const a = agendaData.find(x=>x.id===id);
     if(!a) return;
-    document.getElementById('editId').value = a.id_informasi;
-    document.getElementById('formTitle').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Ubah Pengumuman';
-    document.getElementById('formSubtitle').textContent = `Mengedit: ${a.judul}`;
-    document.getElementById('inputJudul').value = a.judul;
-    document.getElementById('inputKategori').value = a.kategori;
-    document.getElementById('inputTanggal').value = a.tanggal_publikasi;
-    document.getElementById('inputPenulis').value = a.penulis||'';
-    document.getElementById('inputKonten').value = a.konten;
-    document.getElementById('inputTarget').value = a.target_pembaca||'semua';
-    document.getElementById('inputPrioritas').value = a.prioritas||'normal';
+    resetForm();
+    document.getElementById('editId').value = a.id;
+    document.getElementById('formTitle').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Edit Agenda';
+    document.getElementById('formSubtitle').textContent = `Mengedit: ${a.title}`;
+    document.getElementById('fTitle').value = a.title;
+    document.getElementById('fCategory').value = a.category;
+    document.getElementById('fDateStart').value = a.dateStart;
+    document.getElementById('fDateEnd').value = a.dateEnd||'';
+    document.getElementById('fTimeStart').value = a.timeStart||'';
+    document.getElementById('fTimeEnd').value = a.timeEnd||'';
+    document.getElementById('fFullDay').value = a.fullDay?'1':'0';
+    document.getElementById('fLocation').value = a.location;
+    document.getElementById('fTarget').value = a.target;
+    document.getElementById('fEstPeserta').value = a.estPeserta||'';
+    document.getElementById('fParticipants').value = a.participants||'';
+    document.getElementById('fDesc').value = a.desc;
+    document.getElementById('fPriority').value = a.priority||'normal';
+    document.getElementById('fCountdown').value = a.countdown?'1':'0';
+    document.getElementById('fReminder').value = a.reminder?'1':'0';
+    switchTab('form');
+};
+
+function resetForm(){
+    document.getElementById('agendaForm').reset();
+    document.getElementById('editId').value = '';
+    document.getElementById('fDateStart').value = new Date().toISOString().split('T')[0];
 }
 
-window.resetForm = function(){
-    document.getElementById('annForm').reset();
-    document.getElementById('editId').value = '';
-    document.getElementById('formTitle').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Buat Pengumuman Baru';
-    document.getElementById('formSubtitle').textContent = 'Lengkapi informasi pengumuman sebelum dipublikasikan';
-    document.getElementById('inputTanggal').value = new Date().toISOString().split('T')[0];
-    document.getElementById('previewBox').classList.remove('visible');
-};
+function switchTab(tab){
+    document.querySelectorAll('.page-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    document.getElementById(`tab-${tab}`).classList.add('active');
+}
 
-// Submit = publish
-document.getElementById('annForm').addEventListener('submit',function(e){
+// ============ SAVE ============
+document.getElementById('agendaForm').addEventListener('submit',function(e){
     e.preventDefault();
-    saveAnnouncement('published');
+    saveAgenda('mendatang');
 });
 
-window.saveAsDraft = function(){
-    const judul = document.getElementById('inputJudul').value.trim();
-    const konten = document.getElementById('inputKonten').value.trim();
-    if(!judul||!konten){ showToast('error','Form Belum Lengkap','Judul dan konten wajib diisi'); return; }
-    saveAnnouncement('draft');
-};
+window.saveDraft = function(){ saveAgenda('draft'); };
 
-async function saveAnnouncement(status){
+async function saveAgenda(status){
     const editId = document.getElementById('editId').value;
-    let files = document.getElementById('inputFiles').files[0];
+    const title = document.getElementById('fTitle').value.trim();
+    const category = document.getElementById('fCategory').value;
+    const dateStart = document.getElementById('fDateStart').value;
+    const location = document.getElementById('fLocation').value.trim();
+    const target = document.getElementById('fTarget').value;
+    const desc = document.getElementById('fDesc').value.trim();
 
-      // Buat FormData object
-    const formData = new FormData();
-    formData.append('judul', document.getElementById('inputJudul').value.trim());
-    formData.append('kategori', document.getElementById('inputKategori').value);
-    formData.append('tanggal_publikasi', document.getElementById('inputTanggal').value);
-    formData.append('konten', document.getElementById('inputKonten').value.trim());
-    formData.append('target_pembaca', document.getElementById('inputTarget').value);
-    formData.append('prioritas', document.getElementById('inputPrioritas').value);
-    formData.append('status', status);
-
-    formData.append('isUpdateFile', 'false');
-    if (files) {
-        formData.append('files', files);
+    if(!title||!category||!dateStart||!location||!target||!desc){
+        showToast('error','Form Belum Lengkap','Harap isi semua field yang wajib (*)');return;
     }
 
-
-    const data = {
-        judul: document.getElementById('inputJudul').value.trim(),
-        kategori: document.getElementById('inputKategori').value,
-        tanggal_publikasi: document.getElementById('inputTanggal').value,
-        //penulis: document.getElementById('inputPenulis').value.trim(),
-        konten: document.getElementById('inputKonten').value.trim(),
-        target_pembaca: document.getElementById('inputTarget').value,
-        prioritas: document.getElementById('inputPrioritas').value,
-        status: status
+    const entry = {
+        judul: title, 
+        id_jenis_agenda: category,
+        tanggal_mulai : dateStart,
+        dateEnd: document.getElementById('fDateEnd').value||'',
+        timeStart: document.getElementById('fTimeStart').value||'',
+        timeEnd: document.getElementById('fTimeEnd').value||'',
+        fullDay: document.getElementById('fFullDay').value==='1',
+        lokasi : location,
+        target_peserta: target,
+        estimasi_peserta: parseInt(document.getElementById('fEstPeserta').value)||0,
+        participants: document.getElementById('fParticipants').value.trim(),
+        deskripsi: desc,
+        priority: document.getElementById('fPriority').value,
+        countdown: document.getElementById('fCountdown').value==='1',
+        reminder: document.getElementById('fReminder').value==='1',
+        status,
+        isUpdateFile: 'false'
     };
 
-    const submitData =  new MyFetch('/sms/agenda/add', 
-            {
-                method: 'POST',
-                csrfHash: document.getElementById('csrf_edusmara').textContent,
-                params : formData
-            }
-        );
+     const submitdata =  new MyFetch('/sms/agenda/add', 
+                            {
+                                method: 'POST',
+                                csrfHash: document.getElementById('csrf_edusmara').textContent,
+                                params : entry
+                            }
+                        );
 
-    if(!data.judul||!data.kategori||!data.tanggal_publikasi||!data.konten){
-        showToast('error','Form Belum Lengkap','Harap isi semua field wajib'); return;
-    }
+    if(editId){
 
-    if(editId !== '' && editId !== null && editId !== undefined){
-        //resetMsgError();
-        if (files) {
-            formData.append('isUpdateFile', 'true');
-        }
-             const updateData =  new MyFetch('/sms/agenda/update/' + editId, 
+        const updateData =  new MyFetch('/sms/agenda/update/' + editId, 
                                 {
                                     method: 'POST',
                                     csrfHash: document.getElementById('csrf_edusmara').textContent,
-                                    params : formData
+                                    params : entry
                                 }
                             );
 
             try {
                 const result = await updateData.fetchData();
                 if(result.status){
-                    showToast('success', 'Berhasil!', `Data ${data.judul} berhasil diperbarui.`);
+                    showToast('success', 'Berhasil!', `Data ${entry.judul} berhasil diperbarui.`);
                     reloadData();
                 }
             } catch (error) {
@@ -311,19 +307,21 @@ async function saveAnnouncement(status){
 
 
                 } else {
-                    showToast('error', 'Gagal!', `Terjadi kesalahan saat menambahkan data pengumuman.`);
+                    showToast('error', 'Gagal!', `Terjadi kesalahan saat menambahkan data Agenda.`);
                 }
 
                 return;
             }
-    } else {
 
-         //resetMsgError();
-            try {
-                const result = await submitData.fetchData();
+        // const idx = agendaData.findIndex(a=>a.id===parseInt(editId));
+        // if(idx>-1) agendaData[idx] = {...agendaData[idx],...entry};
+        // showToast('success','Agenda Diperbarui','Perubahan berhasil disimpan');
+    } else {
+        try {
+                const result = await submitdata.fetchData();
                 if(result.status){
 
-                    showToast('success', 'Berhasil!', `Pengumuman ${data.judul} berhasil ditambahkan.`);
+                    showToast('success', 'Berhasil!', `Agenda ${entry.judul} berhasil ditambahkan.`);
                     reloadData();
                 }
             } catch (error) {
@@ -345,102 +343,60 @@ async function saveAnnouncement(status){
 
 
                 } else {
-                    showToast('error', 'Gagal!', `Terjadi kesalahan saat menambahkan data pengumuman.`);
+                    showToast('error', 'Gagal!', `Terjadi kesalahan saat menambahkan data Agenda.`);
                 }
 
                return;
             }
+
+        // entry.id = nextId++;
+        // entry.createdAt = new Date().toISOString();
+        // agendaData.push(entry);
+        // toast('success',status==='draft'?'Draft Disimpan':'Agenda Dipublikasikan',`"${title}" berhasil ${status==='draft'?'disimpan sebagai draft':'dipublikasikan'}`);
     }
 
     function reloadData() {
-        loadDataFromServer();
-        updateSummary();
-        renderList();
-        resetForm();
+                loadDataFromServer();
+                updateSummary();
+                renderList();
+                resetForm();
 
-        // Kembali ke Tab List
-        const listTab = document.querySelector('[data-tab="list"]');
-        const listContent = document.getElementById('tab-list');
-        if(listTab && listContent) {
-            document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            listTab.classList.add('active');
-            listContent.classList.add('active');
+                // Kembali ke Tab List
+                const listTab = document.querySelector('[data-tab="list"]');
+                const listContent = document.getElementById('tab-list');
+                if(listTab && listContent) {
+                    document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    listTab.classList.add('active');
+                    listContent.classList.add('active');
+            }
         }
 
-    }
+    //renderList(); updateSummary(); resetForm(); 
 }
 
-// ============ EDITOR TOOLBAR ============
-window.insertFormat = function(before,after){
-    const ta = document.getElementById('inputKonten');
-    const start = ta.selectionStart, end = ta.selectionEnd;
-    const selected = ta.value.substring(start,end);
-    const replacement = before + (selected||'teks') + after;
-    ta.setRangeText(replacement,start,end,'select');
-    ta.focus();
-};
-
-window.insertPrefix = function(prefix){
-    const ta = document.getElementById('inputKonten');
-    const start = ta.selectionStart;
-    const lineStart = ta.value.lastIndexOf('\n',start-1)+1;
-    ta.setRangeText(prefix,lineStart,lineStart,'end');
-    ta.focus();
-};
-
-window.insertBlock = function(text){
-    const ta = document.getElementById('inputKonten');
-    const pos = ta.selectionStart;
-    const insert = '\n'+text+'\n';
-    ta.setRangeText(insert,pos,pos,'end');
-    ta.focus();
-};
-
-window.togglePreview = function(){
-    const box = document.getElementById('previewBox');
-    const content = document.getElementById('inputKonten').value;
-    if(box.classList.contains('visible')){
-        box.classList.remove('visible');
-    } else {
-        document.getElementById('previewContent').textContent = content || '(kosong)';
-        box.classList.add('visible');
-    }
-};
-
 // ============ DELETE ============
-window.openDeleteConfirm = function(){
-    const a = annData.find(x=>x.id_informasi==currentDetailId);
-    alert('id: '+currentDetailId);
+window.openDeleteConfirm = function(id){
+    const a = agendaData.find(x=>x.id===id);
     if(!a) return;
-    detailModalInst.hide();
-    document.getElementById('deleteId').value = a.id_informasi;
-    document.getElementById('deleteName').textContent = a.judul;
-    setTimeout(()=>deleteModalInst.show(),300);
-};
-
-window.openDeleteDirect = function(id){
-    const a = annData.find(x=>x.id_informasi==id);
-    alert('id: '+id);
-    if(!a) return;
-    document.getElementById('deleteId').value = a.id_informasi;
-    document.getElementById('deleteName').textContent = a.judul;
+    document.getElementById('delId').value = a.id;
+    document.getElementById('delName').textContent = a.title;
     deleteModalInst.show();
 };
 
 window.confirmDelete = function(){
-    const id = parseInt(document.getElementById('deleteId').value);
-    const a = annData.find(x=>x.id_informasi==id);
+    const id = parseInt(document.getElementById('delId').value);
+    const a = agendaData.find(x=>x.id==id);
     if(!a) return;
 
-        const removeData =  new MyFetch('/agenda/delete/' + id, {method: 'GET', csrfHash: document.getElementById('csrf_edusmara').textContent});
+        const removeData =  new MyFetch('/sms/agenda/delete/' + id, {method: 'GET', csrfHash: document.getElementById('csrf_edusmara').textContent});
 
         try {
             removeData.fetchData().then(result => {
                 console.log('Delete Result:', result);
                 if(result.status){
-                    showToast('warning', 'Dihapus', `Data pengumuman ${a.judul} telah dihapus permanen.`);
-                    annData = annData.filter(x => x.id_informasi !== id);
+                    showToast('warning', 'Dihapus', `Data ${a.judul} telah dihapus permanen.`);
+                    //agendaData = agendaData.filter(x => x.id !== id);
                     loadDataFromServer();
                     updateSummary();
                     renderList();
@@ -450,43 +406,17 @@ window.confirmDelete = function(){
 
         } catch (error) {
             console.error(error);
-            showToast('warning', 'Dihapus', error.message || `Terjadi kesalahan saat menghapus data kelas ${k.judul}.`);
+            showToast('warning', 'Dihapus', error.message || `Terjadi kesalahan saat menghapus ${k.judul}.`);
         }
-        
 };
-
-// ============ SUMMARY ============
-function updateSummary(){
-    document.getElementById('sumTotal').textContent = annData.length;
-    document.getElementById('sumPublished').textContent = annData.filter(a=>a.status==='published').length;
-    document.getElementById('sumDraft').textContent = annData.filter(a=>a.status==='draft').length;
-    const cats = new Set(annData.map(a=>a.kategori));
-    document.getElementById('sumCategories').textContent = cats.size;
-}
 
 // ============ HELPERS ============
-//function saveData(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(annData)); }
-function formatDate(d){ return d?new Date(d).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}):'-'; }
-function formatDateLong(d){ return d?new Date(d).toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'-'; }
-
-// ============ TOAST ============
-window.showToast = function(type,title,msg){
-    const container = document.getElementById('toastContainer');
-    const icons = {success:'fa-circle-check',info:'fa-circle-info',warning:'fa-triangle-exclamation',error:'fa-circle-xmark'};
-    const toast = document.createElement('div');
-    toast.className = `toast-custom ${type}`;
-    toast.innerHTML = `<i class="fa-solid ${icons[type]}"></i><div class="toast-content"><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div><button class="toast-close"><i class="fa-solid fa-xmark"></i></button>`;
-    container.appendChild(toast);
-    toast.querySelector('.toast-close').addEventListener('click',()=>{toast.classList.add('hiding');setTimeout(()=>toast.remove(),300);});
-    setTimeout(()=>{if(toast.parentNode){toast.classList.add('hiding');setTimeout(()=>toast.remove(),300);}},3500);
-};
-
-function resetMsgError() {
-    const errorFields = document.querySelectorAll('.is-invalid');
-    errorFields.forEach(field => field.classList.remove('is-invalid'));
-    const errorNotes = document.querySelectorAll('.form-note');
-    errorNotes.forEach(note => note.textContent = '');
+function formatDateRange(start,end){
+    if(!start) return '-';
+    const s = new Date(start).toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    if(!end) return s;
+    const e = new Date(end).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+    return `${s} s.d. ${e}`;
 }
-
 
 })();

@@ -421,7 +421,6 @@ window.openDeleteConfirm = function(){
 
 window.openDeleteDirect = function(id){
     const a = annData.find(x=>x.id_informasi==id);
-    alert('id: '+id);
     if(!a) return;
     document.getElementById('deleteId').value = a.id_informasi;
     document.getElementById('deleteName').textContent = a.judul;
@@ -433,7 +432,7 @@ window.confirmDelete = function(){
     const a = annData.find(x=>x.id_informasi==id);
     if(!a) return;
 
-        const removeData =  new MyFetch('/pengumuman/delete/' + id, {method: 'GET', csrfHash: document.getElementById('csrf_edusmara').textContent});
+        const removeData =  new MyFetch('/sms/pengumuman/delete/' + id, {method: 'GET', csrfHash: document.getElementById('csrf_edusmara').textContent});
 
         try {
             removeData.fetchData().then(result => {
@@ -450,7 +449,7 @@ window.confirmDelete = function(){
 
         } catch (error) {
             console.error(error);
-            showToast('warning', 'Dihapus', error.message || `Terjadi kesalahan saat menghapus data kelas ${k.judul}.`);
+            showToast('warning', 'Dihapus', error.message || `Terjadi kesalahan saat menghapus data ${k.judul}.`);
         }
         
 };

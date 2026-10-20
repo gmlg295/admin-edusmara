@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Controllers\Master;
+namespace App\Modules\SMS\Controllers\Master;
 use App\Controllers\BaseController;
 
 class Master extends BaseController
 {
     public function kelas(): string
     {
-        return view('content/master/master_kelas', [
+        return view('App\Modules\SMS\Views\content\master\master_kelas', [
             'title' => 'Dashboard Admin - EDUSMARA',
             'active' => 'dashboard',
             'load_js' => 'page/master/kelas.js',
@@ -18,7 +18,7 @@ class Master extends BaseController
     
     public function guru(): string
     {
-        return view('content/master/master_guru', [
+        return view('App\Modules\SMS\Views\content\master\master_guru', [
             'title' => 'Master Guru - EDUSMARA',
             'active' => 'master',
             'load_js' => 'page/master/guru.js',
@@ -29,7 +29,7 @@ class Master extends BaseController
     
     public function agenda(): string
     {
-        return view('content/master/master_agenda', [
+        return view('App\Modules\SMS\Views\content\master\master_agenda', [
             'title' => 'Master Agenda - EDUSMARA',
             'active' => 'master',
             'load_js' => 'page/master/agenda.js',
@@ -40,7 +40,7 @@ class Master extends BaseController
     
     public function mapel(): string
     {
-        return view('content/master/master_pengumuman', [
+        return view('App\Modules\SMS\Views\content\master\master_pengumuman', [
             'title' => 'Master Agenda - EDUSMARA',
             'active' => 'master',
             'load_js' => 'page/master/pengumuman.js',
@@ -51,18 +51,7 @@ class Master extends BaseController
 
     public function kategoriInformasi(): string
     {
-        return view('content/master/master_pengumuman', [
-            'title' => 'Master Agenda - EDUSMARA',
-            'active' => 'master',
-            'load_js' => 'page/master/pengumuman.js',
-            'load_css' => 'page/master/pengumuman-style.css',
-            'enable_menu' => false,
-        ]);
-    }
-    
-    public function kategoriPrestasi(): string
-    {
-        return view('content/master/master_pengumuman', [
+        return view('App\Modules\SMS\Views\content\master\master_pengumuman', [
             'title' => 'Master Agenda - EDUSMARA',
             'active' => 'master',
             'load_js' => 'page/master/pengumuman.js',
@@ -71,9 +60,20 @@ class Master extends BaseController
         ]);
     }
 
+    public function kategoriPrestasi(): string
+    {
+        return view('content/master/master_kategoriprestasi', [
+            'title' => 'Kategori Prestasi - EDUSMARA',
+            'active' => 'kategoriprestasi',
+            'load_js' => 'page/master/kategoriprestasi.js',
+            'load_css' => 'page/master/kategoriprestasi-style.css',
+            'enable_menu' => false,
+        ]);
+    }
+
     public function jenisAgenda(): string
     {
-        return view('content/master/master_pengumuman', [
+        return view('App\Modules\SMS\Views\content\master\master_pengumuman', [
             'title' => 'Master Agenda - EDUSMARA',
             'active' => 'master',
             'load_js' => 'page/master/pengumuman.js',
@@ -84,7 +84,7 @@ class Master extends BaseController
 
     public function jenisPelanggaran(): string
     {
-        return view('content/master/master_pengumuman', [
+        return view('App\Modules\SMS\Views\content\master\master_pengumuman', [
             'title' => 'Master Agenda - EDUSMARA',
             'active' => 'master',
             'load_js' => 'page/master/pengumuman.js',
@@ -95,7 +95,7 @@ class Master extends BaseController
 
     public function subPelanggaran(): string
     {
-        return view('content/master/master_pengumuman', [
+        return view('App\Modules\SMS\Views\content\master\master_pengumuman', [
             'title' => 'Master Agenda - EDUSMARA',
             'active' => 'master',
             'load_js' => 'page/master/pengumuman.js',
@@ -104,20 +104,21 @@ class Master extends BaseController
         ]);
     }
 
+
     public function tingkatKasus(): string
     {
-        return view('content/master/master_pengumuman', [
-            'title' => 'Master Agenda - EDUSMARA',
-            'active' => 'master',
-            'load_js' => 'page/master/pengumuman.js',
-            'load_css' => 'page/master/pengumuman-style.css',
+        return view('App\Modules\SMS\Views\content\master\master_tingkatkasus', [
+            'title' => 'Tingkat Kasus - EDUSMARA',
+            'active' => 'tingkatkasus',
+            'load_js' => 'page/master/tingkatkasus.js',
+            'load_css' => 'page/master/tingkatkasus-style.css',
             'enable_menu' => false,
         ]);
     }
 
     public function alasanTerlambat(): string
     {
-        return view('content/master/master_pengumuman', [
+        return view('App\Modules\SMS\Views\content\master\master_pengumuman', [
             'title' => 'Master Agenda - EDUSMARA',
             'active' => 'master',
             'load_js' => 'page/master/pengumuman.js',
@@ -128,18 +129,18 @@ class Master extends BaseController
 
     public function sanksi(): string
     {
-        return view('content/master/master_pengumuman', [
-            'title' => 'Master Agenda - EDUSMARA',
-            'active' => 'master',
-            'load_js' => 'page/master/pengumuman.js',
-            'load_css' => 'page/master/pengumuman-style.css',
+        return view('content/master/master_sanksi', [
+            'title' => 'Sanksi - EDUSMARA',
+            'active' => 'sanksi',
+            'load_js' => 'page/master/sanksi.js',
+            'load_css' => 'page/master/sanksi-style.css',
             'enable_menu' => false,
         ]);
     }
 
     public function jenjang(): string
     {
-        return view('content/master/master_pengumuman', [
+        return view('App\Modules\SMS\Views\content\master\master_pengumuman', [
             'title' => 'Master Agenda - EDUSMARA',
             'active' => 'master',
             'load_js' => 'page/master/pengumuman.js',
@@ -150,7 +151,7 @@ class Master extends BaseController
 
     public function profilSekolah(): string
     {
-        return view('content/master/master_pengumuman', [
+        return view('App\Modules\SMS\Views\content\master\master_pengumuman', [
             'title' => 'Master Agenda - EDUSMARA',
             'active' => 'master',
             'load_js' => 'page/master/pengumuman.js',
@@ -158,10 +159,10 @@ class Master extends BaseController
             'enable_menu' => false,
         ]);
     }
-    
+
     public function pengaturan(): string
     {
-        return view('content/master/master_pengumuman', [
+        return view('App\Modules\SMS\Views\content\master\master_pengumuman', [
             'title' => 'Master Agenda - EDUSMARA',
             'active' => 'master',
             'load_js' => 'page/master/pengumuman.js',
