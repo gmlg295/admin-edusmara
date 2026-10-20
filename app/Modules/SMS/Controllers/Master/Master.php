@@ -118,11 +118,11 @@ class Master extends BaseController
 
     public function alasanTerlambat(): string
     {
-        return view('App\Modules\SMS\Views\content\master\master_pengumuman', [
-            'title' => 'Master Agenda - EDUSMARA',
-            'active' => 'master',
-            'load_js' => 'page/master/pengumuman.js',
-            'load_css' => 'page/master/pengumuman-style.css',
+        return view('App\Modules\SMS\Views\content\master\master_alasanterlambat', [
+            'title' => 'Alasan Terlambat - EDUSMARA',
+            'active' => 'alasanterlambat',
+            'load_js' => 'page/master/alasanterlambat.js',
+            'load_css' => 'page/master/alasanterlambat-style.css',
             'enable_menu' => false,
         ]);
     }

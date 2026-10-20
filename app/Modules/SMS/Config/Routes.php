@@ -72,6 +72,14 @@ $routes->group('sms/sanksi', ['namespace' => 'App\Modules\SMS\Controllers', 'fil
     $routes->get('delete/(:num)', 'Sanksi\Sanksi::delete/$1');
 });
 
+$routes->group('sms/alasanterlambat', ['namespace' => 'App\Modules\SMS\Controllers', 'filter' => 'adminfilter'], function($routes) {
+    $routes->get('/', 'AlasanTerlambat\AlasanTerlambat::index');
+    $routes->get('getData', 'AlasanTerlambat\AlasanTerlambat::getData');
+    $routes->post('create', 'AlasanTerlambat\AlasanTerlambat::create');
+    $routes->post('update/(:num)', 'AlasanTerlambat\AlasanTerlambat::update/$1');
+    $routes->get('delete/(:num)', 'AlasanTerlambat\AlasanTerlambat::delete/$1');
+});
+
 $routes->group('sms/nilai', ['namespace' => 'App\Modules\SMS\Controllers', 'filter' => 'adminfilter'], function($routes) {
     $routes->get('/', 'Nilai::index');
 });
@@ -114,7 +122,7 @@ $routes->group('sms/master', ['namespace' => 'App\Modules\SMS\Controllers', 'fil
     $routes->get('jenis-pelanggaran', 'Master\SubJenisPelanggaran::index');
     $routes->get('sub-pelanggaran', 'Master\Master::subPelanggaran');
     $routes->get('tingkat-kasus', 'TingkatKasus\TingkatKasus::index');
-    $routes->get('alasan-terlambat', 'Master\Master::alasanTerlambat');
+    $routes->get('alasan-terlambat', 'AlasanTerlambat\AlasanTerlambat::index');
     $routes->get('sanksi', 'Sanksi\Sanksi::index');
     $routes->get('jenjang', 'Master\Master::jenjang');
     $routes->get('profil-sekolah', 'Master\Master::profilSekolah');
